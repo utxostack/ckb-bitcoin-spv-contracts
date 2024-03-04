@@ -9,6 +9,12 @@
 
 [License]: https://img.shields.io/badge/License-MIT-blue.svg
 
+## Contracts
+
+- For testing purpose only:
+
+  - ["Can Update Without Ownership" Lock](contracts/can-update-without-ownership-lock)
+
 ## License
 
 Licensed under [MIT License].

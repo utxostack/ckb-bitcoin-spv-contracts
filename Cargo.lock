@@ -69,6 +69,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "buddy-alloc"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f0d2da64a6a895d5a7e0724882825d50f83c13396b1b9f1878e19a024bab395"
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -81,6 +87,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "can-update-without-ownership-lock"
+version = "0.1.0-alpha.0"
+dependencies = [
+ "ckb-std",
 ]
 
 [[package]]
@@ -376,6 +389,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ckb-std"
+version = "0.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6f72eb58dfefcc444621dc97020ef96af0636aa59e26b9c110359cb6e37db59"
+dependencies = [
+ "buddy-alloc",
+ "cc",
+ "ckb-gen-types",
+ "gcd",
+]
+
+[[package]]
 name = "ckb-system-scripts"
 version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -590,6 +615,12 @@ dependencies = [
  "crc32fast",
  "miniz_oxide",
 ]
+
+[[package]]
+name = "gcd"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d758ba1b47b00caf47f24925c0074ecb20d6dfcffe7f6d53395c0465674841a"
 
 [[package]]
 name = "getrandom"
