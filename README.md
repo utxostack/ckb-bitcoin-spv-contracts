@@ -11,6 +11,8 @@
 
 ## Contracts
 
+- [A type script for Bitcoin SPV clients.](contracts/ckb-bitcoin-spv-type-lock)
+
 - For testing purpose only:
 
   - ["Can Update Without Ownership" Lock](contracts/can-update-without-ownership-lock)
