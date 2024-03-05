@@ -26,6 +26,12 @@ BUILD_DIR :=
 # more than one binary is supported here.
 BINARIES := $(notdir $(shell pwd))
 
+# Some older crates might not be prepared to be built against clang, we would
+# need to override CFLAGS to prepare them.
+TARGET_CFLAGS := --target=riscv64 -march=rv64imc_zba_zbb_zbc_zbs \
+	-nostdinc -nostdlib \
+	-I $(TOP)deps/ckb-c-stdlib/libc -DCKB_DECLARATION_ONLY
+
 ifeq (release,$(MODE))
 	MODE_ARGS := --release
 endif
@@ -34,6 +40,7 @@ default: build test
 
 build:
 	RUSTFLAGS="$(FULL_RUSTFLAGS)" TARGET_CC="$(CLANG)" \
+		TARGET_CFLAGS="$(TARGET_CFLAGS)" \
 		cargo build --target=riscv64imac-unknown-none-elf $(MODE_ARGS) $(CARGO_ARGS)
 	@set -eu; \
 	if [ "x$(BUILD_DIR)" != "x" ]; then \
