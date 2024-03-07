@@ -5,8 +5,8 @@ authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
 description = "A type script for Bitcoin SPV clients."
-homepage = "https://github.com/yangby-cryptape/ckb-bitcoin-spv-contracts"
-repository = "https://github.com/yangby-cryptape/ckb-bitcoin-spv-contracts"
+homepage = "https://github.com/ckb-cell/ckb-bitcoin-spv-contracts"
+repository = "https://github.com/ckb-cell/ckb-bitcoin-spv-contracts"
 
 [dependencies]
 ckb-std = "0.15.1"
@@ -14,7 +14,7 @@ ckb-hash = { version = "0.112.1", default-features = false, features = ["ckb-con
 
 [dependencies.ckb-bitcoin-spv-verifier]
 version = "0.1.0"
-git = "https://github.com/yangby-cryptape/ckb-bitcoin-spv"
+git = "https://github.com/ckb-cell/ckb-bitcoin-spv"
 rev = "106e59e"
 default-features = false
 features = ["no-std"]

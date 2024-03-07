@@ -5,8 +5,8 @@ authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
 description = "This contract is used for testing only."
-homepage = "https://github.com/yangby-cryptape/ckb-bitcoin-spv-contracts"
-repository = "https://github.com/yangby-cryptape/ckb-bitcoin-spv-contracts"
+homepage = "https://github.com/ckb-cell/ckb-bitcoin-spv-contracts"
+repository = "https://github.com/ckb-cell/ckb-bitcoin-spv-contracts"
 
 [dependencies]
 ckb-std = "0.15.1"
