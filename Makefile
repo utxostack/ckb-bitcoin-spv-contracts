@@ -57,8 +57,11 @@ run:
 
 # test, check, clippy and fmt here are provided for completeness,
 # there is nothing wrong invoking cargo directly instead of make.
+
+NEXTEST_RUN_ARGS := --no-fail-fast --success-output never --failure-output final
 test:
-	cargo test $(CARGO_ARGS)
+	cargo nextest run ${NEXTEST_RUN_ARGS} --workspace
+
 
 check:
 	cargo check $(CARGO_ARGS)
