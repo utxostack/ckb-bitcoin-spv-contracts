@@ -3,11 +3,11 @@ use ckb_testtool::{
     context::Context,
 };
 
-use crate::{prelude::*, Loader};
-
-const MAX_CYCLES: u64 = 10_000_000;
+use crate::{prelude::*, utilities, Loader};
 
 fn run_test(inputs_capacity: &[u64], outputs_capacity: &[u64]) {
+    utilities::setup();
+
     let loader = Loader::default();
     let mut context = Context::default();
 
@@ -18,6 +18,9 @@ fn run_test(inputs_capacity: &[u64], outputs_capacity: &[u64]) {
         context
             .build_script(&lock_out_point, Default::default())
             .expect("script")
+            .as_builder()
+            .args([0u8, 1, 2, 3].pack())
+            .build()
     };
 
     let inputs = inputs_capacity
@@ -50,8 +53,8 @@ fn run_test(inputs_capacity: &[u64], outputs_capacity: &[u64]) {
         .build();
     let tx = context.complete_tx(tx);
 
-    let inputs_total: u64 = inputs_capacity.iter().map(|cap| *cap).sum();
-    let outputs_total: u64 = outputs_capacity.iter().map(|cap| *cap).sum();
+    let inputs_total: u64 = inputs_capacity.iter().copied().sum();
+    let outputs_total: u64 = outputs_capacity.iter().copied().sum();
     if inputs_total > outputs_total {
         let _ = context.should_be_failed(&tx, MAX_CYCLES);
     } else {

@@ -154,9 +154,9 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 
   - The height of that header.
 
-- Use [the API `SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/106e59ec53c2165b10c0e5a206dce7f2c0d1d2d6/verifier/src/types/extension/packed.rs#L255-L266) to verify the transaction.
+- Use [the API `SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/29a8710/verifier/src/types/extension/packed.rs#L275-L292) to verify the transaction.
 
-  A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/106e59ec53c2165b10c0e5a206dce7f2c0d1d2d6/prover/src/tests/service.rs#L103-L119).
+  A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/29a8710/prover/src/tests/service.rs#L126-L171).
 
 [Bitcoin]: https://bitcoin.org/
 [CKB]: https://github.com/nervosnetwork/ckb

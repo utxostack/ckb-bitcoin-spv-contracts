@@ -13,12 +13,17 @@ use std::str::FromStr;
 
 #[cfg(test)]
 mod contracts;
+#[cfg(test)]
+pub(crate) mod utilities;
 
 pub mod prelude {
     use ckb_testtool::{
         ckb_error::Error,
         ckb_types::core::{Cycle, TransactionView},
     };
+
+    pub const MAX_CYCLES: u64 = 10_000_000;
+    pub const SPV_CELL_CAP: u64 = 500;
 
     // This helper method runs Context::verify_tx, but in case error happens,
     // it also dumps current transaction to failed_txs folder.
@@ -107,7 +112,7 @@ impl Loader {
 impl prelude::ContextExt for Context {
     fn should_be_passed(&self, tx: &TransactionView, max_cycles: u64) -> Result<Cycle, Error> {
         let result = self.verify_tx(tx, max_cycles);
-        if result.is_err() {
+        if let Err(err) = result {
             let mut path = env::current_dir().expect("current dir");
             path.push("failed_txs");
             std::fs::create_dir_all(&path).expect("create failed_txs dir");
@@ -116,7 +121,7 @@ impl prelude::ContextExt for Context {
             path.push(format!("0x{:x}.json", tx.hash()));
             println!("Failed tx written to {:?}", path);
             std::fs::write(path, json).expect("write");
-            panic!("should be passed");
+            panic!("should be passed, but failed since {err}");
         }
         result
     }
