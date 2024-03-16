@@ -67,7 +67,7 @@ check:
 	cargo check $(CARGO_ARGS)
 
 clippy:
-	cargo clippy $(CARGO_ARGS)
+	cargo clippy $(CARGO_ARGS) --workspace --tests -- --deny warnings
 
 fmt:
 	cargo fmt $(CARGO_ARGS)

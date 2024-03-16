@@ -1,1 +1,2 @@
 mod can_update_without_ownership_lock;
+mod ckb_bitcoin_spv_type_lock;

@@ -6,3 +6,20 @@ edition = "2021"
 [dependencies]
 ckb-testtool = "0.10.2"
 serde_json = "1.0"
+
+[dev-dependencies]
+ckb-std = "0.15"
+bitcoin = { version = "0.31", features = ["serde"] }
+log = "0.4"
+env_logger = "0.11"
+walkdir = "2.4"
+
+[dev-dependencies.ckb-bitcoin-spv-prover]
+version = "0.1.0"
+git = "https://github.com/ckb-cell/ckb-bitcoin-spv"
+rev = "29a8710"
+
+[dev-dependencies.ckb-bitcoin-spv-verifier]
+version = "0.1.0"
+git = "https://github.com/ckb-cell/ckb-bitcoin-spv"
+rev = "29a8710"
