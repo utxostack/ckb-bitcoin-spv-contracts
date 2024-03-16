@@ -1,7 +1,7 @@
 # CKB Bitcoin SPV Contracts
 
 [![License]](#license)
-[![GitHub Actions]](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/actions)                                                                                       │
+[![GitHub Actions]](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/actions)
 
 > [!WARNING]
 > This repository is still in the proof-of-concept stage.
