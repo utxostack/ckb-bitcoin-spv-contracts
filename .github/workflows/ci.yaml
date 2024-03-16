@@ -1,0 +1,80 @@
+name: CI
+on:
+  push:
+    branches: [ master, develop, release/* ]
+  pull_request:
+    branches: [ master, release/* ]
+defaults:
+  run:
+    shell: bash
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: 1.76.0
+jobs:
+  rustfmt:
+    name: Checks / Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v4
+      - name: Install Rust Toolchain
+        run: |
+          rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal --component rustfmt
+          rustup override set ${{ env.RUST_TOOLCHAIN }}
+      - name: Format Check
+        run: make fmt
+  clippy:
+    name: Checks / Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v4
+      - name: Install Rust Toolchain
+        run: |
+          rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal --component clippy
+          rustup override set ${{ env.RUST_TOOLCHAIN }}
+      - name: Lint Check
+        run: make clippy
+  test:
+    name: Tests / Build & Test
+    needs: [ rustfmt, clippy ]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # TODO when `os: windows-latest`, failed to run custom build command for `ckb-vm v0.24.6`
+        os: [ ubuntu-latest, macos-latest ]
+      fail-fast: true
+      max-parallel: 3
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install LLVM on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 16
+          rm llvm.sh
+      - name: Install LLVM on macOS
+        if: matrix.os == 'macos-latest'
+        run: brew install llvm@16
+      - name: Install LLVM on Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          scoop install llvm yasm
+          echo "$env:USERPROFILE\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Install Rust Toolchain
+        run: |
+          rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
+          rustup override set ${{ env.RUST_TOOLCHAIN }}
+          rustup target add riscv64imac-unknown-none-elf
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Build
+        run: make build
+      - name: Unit Testing
+        run: make test
