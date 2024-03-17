@@ -136,7 +136,42 @@ There are 4 kinds of operations:
 
 - Reorg
 
-  TODO
+  When receives blocks from a new longer chain, and there has at least one
+  client cell whose tip block is the common ancestor block of both the old
+  chain and the new chain, then a chain reorganization will be required.
+
+  **If no common ancestor block was found, then the Bitcoin SPV instance
+  will be broken, and it requires re-deployment.**
+
+  let's denote the client ID of the best common ancestor to be `t`.
+
+  The structure of this kind of transaction is as follows:
+
+  ```yaml
+  Cell Deps:
+  - Type Lock
+  - SPV Client (id=t)
+  - ... ...
+  Inputs:
+  - SPV Info (last_client_id=k)
+  - SPV Client (id=t+1)
+  - SPV Client (id=t+2)
+  - SPV Client (id=...)
+  - SPV Client (id=k)
+  - ... ...
+  Outputs:
+  - SPV Info (last_client_id=t+1)
+  - SPV Client (id=t+1)
+  - SPV Client (id=t+2)
+  - SPV Client (id=...)
+  - SPV Client (id=k)
+  - ... ...
+  Witnesses:
+  - Skipped
+    Because the 1st output is the SPV info, but only the new tip client cell requires witness.
+  - SPV Update
+  - ... ...
+  ```
 
 ### Usages
 
@@ -154,9 +189,9 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 
   - The height of that header.
 
-- Use [the API `SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/29a8710/verifier/src/types/extension/packed.rs#L275-L292) to verify the transaction.
+- Use [the API `SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/verifier/src/types/extension/packed.rs#L275-L292) to verify the transaction.
 
-  A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/29a8710/prover/src/tests/service.rs#L126-L171).
+  A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/prover/src/tests/service.rs#L132-L181).
 
 [Bitcoin]: https://bitcoin.org/
 [CKB]: https://github.com/nervosnetwork/ckb

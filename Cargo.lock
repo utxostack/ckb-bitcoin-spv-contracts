@@ -232,7 +232,7 @@ checksum = "8b3b72a38c9920a29990df12002c4d069a147c8782f0c211f8a01b2df8f42bfd"
 [[package]]
 name = "ckb-bitcoin-spv-prover"
 version = "0.1.0"
-source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=29a8710#29a87104362f56f4db1353467163a6ba27fc0f91"
+source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=2464c8f#2464c8fb6059f285e6d1b9157b49fd08f7b6efff"
 dependencies = [
  "bitcoin",
  "ckb-bitcoin-spv-verifier",
@@ -252,7 +252,7 @@ dependencies = [
 [[package]]
 name = "ckb-bitcoin-spv-verifier"
 version = "0.1.0"
-source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=29a8710#29a87104362f56f4db1353467163a6ba27fc0f91"
+source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=2464c8f#2464c8fb6059f285e6d1b9157b49fd08f7b6efff"
 dependencies = [
  "bitcoin",
  "bitcoin_hashes",

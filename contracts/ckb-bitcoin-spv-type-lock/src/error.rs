@@ -17,7 +17,7 @@ pub enum InternalError {
     // 0x10 ~ 0x1f: Errors before doing operations.
     UnknownOperation = 0x10,
 
-    // 0x20 ~ 0x37: Errors when create.
+    // 0x20 ~ 0x2e: Errors when create.
     CreateNotEnoughCells = 0x20,
     CreateShouldBeOrdered,
     CreateCellsCountNotMatched,
@@ -28,11 +28,11 @@ pub enum InternalError {
     CreateBadClientCellData,
     CreateNewClientIsIncorrect,
 
-    // 0x38 ~ 0x3f: Errors when destroy.
-    DestroyNotEnoughCells = 0x3f,
+    // 0x2f: Errors when destroy.
+    DestroyNotEnoughCells = 0x2f,
 
-    // 0x40 ~ 0x4f: Errors when update.
-    UpdateInputInfoNotFound = 0x40,
+    // 0x30 ~ 0x3f: Errors when update.
+    UpdateInputInfoNotFound = 0x30,
     UpdateInputClientNotFound,
     UpdateInputClientIdIsMismatch,
     UpdateOutputInfoNotFound,
@@ -44,8 +44,28 @@ pub enum InternalError {
     UpdateCellDepClientIdIsMismatch,
     UpdateWitnessIsNotExisted,
 
-    // 0x50 ~ 0x5f: Errors when reorg.
-    ReorgFailed = 0x50,
+    // 0x40 ~ 0x5f: Errors when reorg.
+    ReorgNotBetterChain = 0x40,
+    ReorgInputMalformed,
+    ReorgInputInfoNotFound,
+    ReorgInputClientNotEnough,
+    ReorgInputInfoDuplicated,
+    ReorgInputTipClientNotFound,
+    ReorgInputTipClientLoadFailed,
+    ReorgInputClientIdsIsMismatch,
+    ReorgOutputMalformed,
+    ReorgOutputInfoNotFound,
+    ReorgOutputInfoDuplicated,
+    ReorgOutputTipClientNotFound,
+    ReorgOutputClientIdsIsMismatch,
+    ReorgNewClientIsIncorrect,
+    ReorgCellDepMoreThanOne,
+    ReorgCellDepNotFound,
+    ReorgCellDepClientNotFound,
+    ReorgCellDepClientIdIsMismatch,
+
+    // This is not an error, just make sure the error code is less than 32.
+    Unreachable = 0x60,
 }
 
 pub enum Error {

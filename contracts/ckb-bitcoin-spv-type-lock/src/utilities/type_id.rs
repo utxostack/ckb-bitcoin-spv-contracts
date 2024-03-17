@@ -4,7 +4,7 @@ use ckb_std::{ckb_constants::Source, high_level as hl};
 
 use crate::error::Result;
 
-pub(crate) fn calculate_type_id(outputs_count: usize) -> Result<[u8; BLAKE2B_LEN]> {
+pub(crate) fn load_then_calculate_type_id(outputs_count: usize) -> Result<[u8; BLAKE2B_LEN]> {
     let input = hl::load_input(0, Source::Input)?;
     let mut blake2b = new_blake2b();
     blake2b.update(input.as_slice());

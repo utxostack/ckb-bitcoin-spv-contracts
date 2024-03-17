@@ -24,6 +24,7 @@ pub mod prelude {
 
     pub const MAX_CYCLES: u64 = 10_000_000;
     pub const SPV_CELL_CAP: u64 = 500;
+    pub const SPV_HEADERS_GROUP_SIZE: usize = 20; // Speed up to save time.
 
     // This helper method runs Context::verify_tx, but in case error happens,
     // it also dumps current transaction to failed_txs folder.

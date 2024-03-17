@@ -9,7 +9,10 @@ use ckb_bitcoin_spv_verifier::types::{
 use ckb_std::ckb_types::prelude::Pack as StdPack;
 use ckb_std::{ckb_constants::Source, debug, error::SysError, high_level as hl};
 
-use crate::error::{InternalError, Result};
+use crate::{
+    error::{InternalError, Result},
+    utilities,
+};
 
 pub(crate) fn update_client(
     inputs: (usize, usize),
@@ -97,11 +100,8 @@ fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8)> {
             .into()
     };
     debug!("clients count: {clients_count}");
-    let expected_client_id = if input_info.tip_client_id + 1 < clients_count {
-        input_info.tip_client_id + 1
-    } else {
-        0
-    };
+
+    let expected_client_id = utilities::next_client_id(input_info.tip_client_id, clients_count);
     debug!("expected client id = {expected_client_id}");
     if input_client_id != expected_client_id {
         return Err(InternalError::UpdateInputClientIdIsMismatch.into());
