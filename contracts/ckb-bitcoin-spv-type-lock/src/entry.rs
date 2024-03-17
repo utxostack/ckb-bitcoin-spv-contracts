@@ -70,12 +70,15 @@ pub fn main() -> Result<()> {
             )?;
         }
         (m, n) if m == n && m > 2 => {
-            // TODO reorg cells
-            debug!("reorg cells");
-            todo!();
+            debug!("reorg client cells");
+            operations::reorg_clients(
+                &indexes_of_inputs,
+                &indexes_of_outputs,
+                script_hash.as_slice(),
+            )?;
         }
-        _ => {
-            debug!("unknown operation: throw an error");
+        (_m, _n) => {
+            debug!("unknown operation: {_m} inputs and {_n} outputs");
             return Err(InternalError::UnknownOperation.into());
         }
     }

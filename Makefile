@@ -62,7 +62,6 @@ NEXTEST_RUN_ARGS := --no-fail-fast --success-output never --failure-output final
 test:
 	cargo nextest run ${NEXTEST_RUN_ARGS} --workspace
 
-
 check:
 	cargo check $(CARGO_ARGS)
 

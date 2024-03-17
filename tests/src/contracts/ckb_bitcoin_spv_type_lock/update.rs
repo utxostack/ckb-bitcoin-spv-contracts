@@ -187,11 +187,7 @@ fn test_normal(case: NormalCase) {
                 .build()
         };
 
-        tip_client_id = if tip_client_id + 1 >= case.clients_count {
-            0
-        } else {
-            tip_client_id + 1
-        };
+        tip_client_id = utilities::next_client_id(tip_client_id, case.clients_count);
 
         let input_spv_client = {
             let spv_client = packed::SpvClient::new_builder()

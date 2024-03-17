@@ -31,7 +31,7 @@ pub(crate) fn create_cells(indexes: &[usize]) -> Result<()> {
         if indexes.len() != cells_count {
             return Err(InternalError::CreateCellsCountNotMatched.into());
         }
-        let type_id = utilities::calculate_type_id(indexes.len())?;
+        let type_id = utilities::load_then_calculate_type_id(indexes.len())?;
         if type_id != type_args.type_id.as_ref() {
             return Err(InternalError::CreateIncorrectUniqueId.into());
         }
