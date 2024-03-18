@@ -44,8 +44,9 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             fork_client_id,
         )
     };
-    // Checks the output info cell and the output client cells; then returns new tip client and its index.
-    let (output_client, output_client_index) =
+    // Checks the output info cell and the output client cells;
+    // then returns new tip client and the index of the info cell.
+    let (output_client, output_info_index) =
         load_outputs(outputs, &expected_info, expected_client_ids)?;
     {
         let new_tip_height: u32 = output_client.headers_mmr_root().max_height().unpack();
@@ -65,8 +66,8 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     };
     // Gets the update from the witness.
     let update = {
-        let witness_args = hl::load_witness_args(output_client_index, Source::Output)?;
-        if let Some(args) = witness_args.input_type().to_opt() {
+        let witness_args = hl::load_witness_args(output_info_index, Source::Output)?;
+        if let Some(args) = witness_args.output_type().to_opt() {
             SpvUpdateReader::from_slice(&args.raw_data())
                 .map_err(|_| SysError::Encoding)?
                 .to_entity()
@@ -190,7 +191,7 @@ fn load_outputs(
     let mut output_info_opt = None;
     let mut tip_client_opt = None;
     let mut expected_client_opt: Option<SpvClient> = None;
-    let mut tip_client_index = 0;
+    let mut info_index = 0;
     for i in outputs {
         debug!("load cell data of outputs[{i}]");
         let output_data = hl::load_cell_data(*i, Source::Output)?;
@@ -213,11 +214,11 @@ fn load_outputs(
             client_ids.push(output_client_id);
             // The new tip SPV client.
             if output_client_id == expected_info.tip_client_id {
-                tip_client_index = *i;
                 tip_client_opt = Some(packed_output_client.to_entity());
             }
         } else if let Ok(packed_output_info) = SpvInfoReader::from_slice(&output_data) {
             debug!("output info = {packed_output_info} (index={i})");
+            info_index = *i;
             if output_info_opt.is_some() {
                 return Err(InternalError::ReorgOutputInfoDuplicated.into());
             }
@@ -249,7 +250,7 @@ fn load_outputs(
         return Err(InternalError::ReorgOutputClientIdsIsMismatch.into());
     }
 
-    Ok((tip_client, tip_client_index))
+    Ok((tip_client, info_index))
 }
 
 fn find_cell_dep(script_hash: &[u8]) -> Result<usize> {

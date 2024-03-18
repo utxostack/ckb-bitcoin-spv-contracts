@@ -53,7 +53,7 @@ pub(crate) fn create_cells(indexes: &[usize]) -> Result<()> {
     // Gets the client bootstrap from the witness.
     let bootstrap = {
         let witness_args = hl::load_witness_args(index, Source::Output)?;
-        if let Some(args) = witness_args.input_type().to_opt() {
+        if let Some(args) = witness_args.output_type().to_opt() {
             SpvBootstrapReader::from_slice(&args.raw_data())
                 .map_err(|_| SysError::Encoding)?
                 .to_entity()

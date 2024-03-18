@@ -152,12 +152,10 @@ fn test_normal(case: NormalCase) {
     };
 
     let witness = {
-        let input_type_args = BytesOpt::new_builder()
+        let type_args = BytesOpt::new_builder()
             .set(Some(Pack::pack(bootstrap.as_slice())))
             .build();
-        let witness_args = WitnessArgs::new_builder()
-            .input_type(input_type_args)
-            .build();
+        let witness_args = WitnessArgs::new_builder().output_type(type_args).build();
         witness_args.as_bytes()
     };
 

@@ -122,12 +122,12 @@ There are 4 kinds of operations:
   - SPV Client (id=k)
   - ... ...
   Inputs:
-  - SPV Client (id=k+1)
   - SPV Info (last_client_id=k)
+  - SPV Client (id=k+1)
   - ... ...
   Outputs:
-  - SPV Client (id=k+1)
   - SPV Info (last_client_id=k+1)
+  - SPV Client (id=k+1)
   - ... ...
   Witnesses:
   - SPV Update
@@ -167,11 +167,13 @@ There are 4 kinds of operations:
   - SPV Client (id=k)
   - ... ...
   Witnesses:
-  - Skipped
-    Because the 1st output is the SPV info, but only the new tip client cell requires witness.
   - SPV Update
   - ... ...
   ```
+
+For all operations, the witness for Bitcoin SPV should be set at the same
+index of the output SPV info cell, and the proof should be set in
+[the field `output_type` of `WitnessArgs`].
 
 ### Usages
 
@@ -197,3 +199,4 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 [CKB]: https://github.com/nervosnetwork/ckb
 
 [`args`]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0019-data-structures/0019-data-structures.md#description-1
+[the field `output_type` of `WitnessArgs`]: https://github.com/nervosnetwork/ckb/blob/v0.114.0/util/gen-types/schemas/blockchain.mol#L117
