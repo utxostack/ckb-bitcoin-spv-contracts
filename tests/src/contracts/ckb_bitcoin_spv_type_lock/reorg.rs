@@ -258,39 +258,31 @@ fn test_normal(case: NormalCase) {
         vec![output; reorg_clients_count + 1]
     };
 
-    let (outputs_data, new_tip_client_cell_index) = {
+    let outputs_data = {
         let mut outputs_data = Vec::new();
         let output_spv_info = packed::SpvInfo::new_builder()
             .tip_client_id(new_tip_client_id.into())
             .build();
         outputs_data.push(output_spv_info.as_slice().pack());
         let mut spv_client = service.tip_client();
-        let mut new_tip_client_cell_index = 0;
-        let mut cell_index = 0;
         for i in &reorg_client_ids {
-            cell_index += 1;
             spv_client.id = *i;
             let packed_spv_client = spv_client.pack();
             outputs_data.push(packed_spv_client.as_slice().pack());
-            if new_tip_client_id == *i {
-                new_tip_client_cell_index = cell_index;
-            }
         }
-        (outputs_data, new_tip_client_cell_index)
+        outputs_data
     };
 
     let witnesses = {
         let mut witnesses = vec![Default::default(); reorg_clients_count + 1];
         let witness_spv_client = {
-            let input_type_args = BytesOpt::new_builder()
+            let type_args = BytesOpt::new_builder()
                 .set(Some(Pack::pack(update.as_slice())))
                 .build();
-            let witness_args = WitnessArgs::new_builder()
-                .input_type(input_type_args)
-                .build();
+            let witness_args = WitnessArgs::new_builder().output_type(type_args).build();
             witness_args.as_slice().pack()
         };
-        witnesses[new_tip_client_cell_index] = witness_spv_client;
+        witnesses[0] = witness_spv_client;
         witnesses
     };
 

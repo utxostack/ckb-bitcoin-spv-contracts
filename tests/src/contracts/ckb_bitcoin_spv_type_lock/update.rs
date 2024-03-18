@@ -205,12 +205,10 @@ fn test_normal(case: NormalCase) {
         let update = service.update(mem::take(&mut headers)).unwrap();
 
         let witness_spv_client = {
-            let input_type_args = BytesOpt::new_builder()
+            let type_args = BytesOpt::new_builder()
                 .set(Some(Pack::pack(update.as_slice())))
                 .build();
-            let witness_args = WitnessArgs::new_builder()
-                .input_type(input_type_args)
-                .build();
+            let witness_args = WitnessArgs::new_builder().output_type(type_args).build();
             witness_args.as_bytes()
         };
 
@@ -237,7 +235,6 @@ fn test_normal(case: NormalCase) {
             .inputs(vec![input_spv_info, input_spv_client])
             .outputs(outputs)
             .outputs_data([output_spv_info.as_bytes(), output_spv_client.as_bytes()].pack())
-            .witness(Default::default())
             .witness(Pack::pack(&witness_spv_client))
             .build();
         let tx = context.complete_tx(tx);

@@ -28,8 +28,8 @@ pub(crate) fn update_client(
         input_info.tip_client_id = expected_client_id;
         (input_info, tip_client_id, expected_client_id)
     };
-    // Checks the output info cell, then returns the output client cell and its index,
-    let (output_client, output_client_index) = load_outputs(outputs, &expected_info)?;
+    // Checks the output info cell, then returns the client cell and the index of the info cell.
+    let (output_client, output_info_index) = load_outputs(outputs, &expected_info)?;
     // Finds the only one index of cell deps which use current script.
     // That cell should be the current tip client.
     let cell_dep_index = find_cell_dep(script_hash)?;
@@ -42,8 +42,8 @@ pub(crate) fn update_client(
     };
     // Gets the update from the witness.
     let update = {
-        let witness_args = hl::load_witness_args(output_client_index, Source::Output)?;
-        if let Some(args) = witness_args.input_type().to_opt() {
+        let witness_args = hl::load_witness_args(output_info_index, Source::Output)?;
+        if let Some(args) = witness_args.output_type().to_opt() {
             SpvUpdateReader::from_slice(&args.raw_data())
                 .map_err(|_| SysError::Encoding)?
                 .to_entity()
@@ -119,12 +119,12 @@ fn load_outputs(
     debug!("load cell data of outputs[{}]", outputs.1);
     let output_data_1 = hl::load_cell_data(outputs.1, Source::Output)?;
 
-    let (packed_output_info, packed_output_client, output_client_index) =
+    let (packed_output_info, packed_output_client, output_info_index) =
         if let Ok(output_info) = SpvInfoReader::from_slice(&output_data_0) {
             debug!("output info = {output_info} (index={})", outputs.0);
             if let Ok(output_client) = SpvClientReader::from_slice(&output_data_1) {
                 debug!("output client = {output_client} (index={})", outputs.1);
-                (output_info, output_client, outputs.1)
+                (output_info, output_client, outputs.0)
             } else {
                 return Err(InternalError::UpdateOutputClientNotFound.into());
             }
@@ -132,7 +132,7 @@ fn load_outputs(
             debug!("output info = {output_info} (index={})", outputs.1);
             if let Ok(output_client) = SpvClientReader::from_slice(&output_data_0) {
                 debug!("output client = {output_client} (index={})", outputs.0);
-                (output_info, output_client, outputs.0)
+                (output_info, output_client, outputs.1)
             } else {
                 return Err(InternalError::UpdateOutputClientNotFound.into());
             }
@@ -146,7 +146,7 @@ fn load_outputs(
         return Err(InternalError::UpdateOutputInfoChanged.into());
     }
 
-    Ok((packed_output_client.to_entity(), output_client_index))
+    Ok((packed_output_client.to_entity(), output_info_index))
 }
 
 fn find_cell_dep(script_hash: &[u8]) -> Result<usize> {
