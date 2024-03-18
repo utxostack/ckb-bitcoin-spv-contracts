@@ -206,8 +206,9 @@ dependencies = [
 
 [[package]]
 name = "can-update-without-ownership-lock"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
+ "ckb-hash",
  "ckb-std",
 ]
 
