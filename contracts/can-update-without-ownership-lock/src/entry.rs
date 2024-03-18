@@ -1,5 +1,6 @@
 use alloc::vec::Vec;
 
+use ckb_hash::blake2b_256;
 #[cfg(debug_assertions)]
 use ckb_std::ckb_types::prelude::*;
 use ckb_std::{ckb_constants::Source, debug, high_level as hl};
@@ -12,7 +13,7 @@ pub fn main() -> Result<()> {
     let script_hash = hl::load_script_hash()?;
     debug!("script hash = {:#x}", script_hash.pack());
     let args = hl::load_script()?.args();
-    let expected_witness = args.raw_data().iter().cloned().rev().collect::<Vec<u8>>();
+    let expected_proof = args.raw_data().iter().cloned().collect::<Vec<u8>>();
 
     let mut checked = false;
 
@@ -34,12 +35,13 @@ pub fn main() -> Result<()> {
 
         if let Ok(witness_args) = hl::load_witness_args(index, Source::Input) {
             if let Some(lock_witness) = witness_args.lock().to_opt() {
-                if lock_witness.raw_data().as_ref() == expected_witness {
+                let actual_proof = blake2b_256(lock_witness.raw_data().as_ref());
+                if actual_proof[..] == expected_proof[..] {
                     checked = true;
                     debug!(">>> >>> passed to check witness");
                 } else {
                     debug!(
-                        ">>> >>> failed to check witness: args: {:#x}, witness: {:#x}",
+                        ">>> >>> failed to check witness: args: {}, witness: {}",
                         args, lock_witness
                     );
                     return Err(Error::WitnessIsIncorrect);

@@ -17,8 +17,11 @@ them.
 
 It will return success when any follow condition is satisfied:
 
-- the witness for this lock script is reverse of the `args` in it.
+- the `args` for this lock script is the result of calling
+  [`ckb_hash::blake2b_256`] on the `witness` of it.
 
 - there is no witness for this lock script, but total capacity of cells
   which use this lock script are not greater than total capacity of cells
   which use this lock script after this transaction.
+
+[`ckb_hash::blake2b_256`]: https://docs.rs/ckb-hash/0.112.1/ckb_hash/fn.blake2b_256.html
