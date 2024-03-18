@@ -195,8 +195,22 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 
   A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/prover/src/tests/service.rs#L132-L181).
 
+### Known Issues
+
+- `VM Internal Error: MemWriteOnExecutablePage`
+
+  Don't set hash type[^1] to be `Data`.
+
+  `Data1` is introduced from [CKB RFC 0032], and `Data2` is introduced from [CKB RFC 0051].
+
+[^1]: [Section "Code Locating"] in "CKB RFC 0022: CKB Transaction Structure".
+
 [Bitcoin]: https://bitcoin.org/
 [CKB]: https://github.com/nervosnetwork/ckb
 
 [`args`]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0019-data-structures/0019-data-structures.md#description-1
 [the field `output_type` of `WitnessArgs`]: https://github.com/nervosnetwork/ckb/blob/v0.114.0/util/gen-types/schemas/blockchain.mol#L117
+
+[Section "Code Locating"]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0022-transaction-structure/0022-transaction-structure.md#code-locating
+[CKB RFC 0032]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0032-ckb-vm-version-selection/0032-ckb-vm-version-selection.md#specification
+[CKB RFC 0051]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0051-ckb2023/0051-ckb2023.md#ckb-vm-v2
