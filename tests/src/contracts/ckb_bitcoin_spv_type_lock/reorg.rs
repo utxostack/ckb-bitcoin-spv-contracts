@@ -27,6 +27,19 @@ fn normal_case_1() {
     test_normal(case);
 }
 
+#[test]
+fn normal_case_2() {
+    let case = NormalCase {
+        headers_path: "case-0822528_0830592",
+        start_height: 828576,
+        stale_height: 829613,
+        clients_count: 20,
+        stale_client_id: 1,
+        reorg_clients_count: 12,
+    };
+    test_normal(case);
+}
+
 struct NormalCase<'a> {
     headers_path: &'a str,
     start_height: u32,
