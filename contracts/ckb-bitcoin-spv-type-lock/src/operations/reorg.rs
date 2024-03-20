@@ -21,12 +21,14 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     // - the expected client ids, which will be the new tip client id and the ids of all the cleared clients.
     // - the height of the old tip client.
     // - the id of the last client, whose blocks are all in main chain.
+    // - the flags in SPV script args
     let (
         expected_info,
         expected_tip_client_id,
         expected_client_ids,
         previous_tip_height,
         fork_client_id,
+        flags,
     ) = {
         let (
             mut input_info,
@@ -34,6 +36,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             expected_client_ids,
             previous_tip_height,
             fork_client_id,
+            flags,
         ) = load_inputs(inputs)?;
         input_info.tip_client_id = expected_tip_client_id;
         (
@@ -42,6 +45,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             expected_client_ids,
             previous_tip_height,
             fork_client_id,
+            flags,
         )
     };
     // Checks the output info cell and the output client cells;
@@ -76,12 +80,12 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
         }
     };
 
-    expected_input_client.verify_new_client(&output_client, update)?;
+    expected_input_client.verify_new_client(&output_client, update, flags)?;
 
     Ok(())
 }
 
-fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8)> {
+fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8, u8)> {
     let mut client_ids_with_indexes = Vec::new();
     let mut input_info_opt = None;
     for i in inputs {
@@ -135,16 +139,17 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8)> {
         }
     };
 
-    let clients_count: u8 = {
+    let (clients_count, flags) = {
         let script = hl::load_script()?;
         let script_args = script.args();
         let script_args_slice = script_args.as_reader().raw_data();
-        SpvTypeArgsReader::from_slice(script_args_slice)
-            .map_err(|_| SysError::Encoding)?
-            .clients_count()
-            .into()
+        let args =
+            SpvTypeArgsReader::from_slice(script_args_slice).map_err(|_| SysError::Encoding)?;
+        let clients_count: u8 = args.clients_count().into();
+        let flags: u8 = args.flags().into();
+        (clients_count, flags)
     };
-    debug!("clients count: {clients_count}");
+    debug!("clients count: {clients_count}, flags: {flags:08b}");
 
     let mut client_ids = client_ids_with_indexes
         .into_iter()
@@ -179,6 +184,7 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8)> {
         expected_client_ids,
         tip_height,
         fork_client_id,
+        flags,
     ))
 }
 

@@ -23,10 +23,10 @@ pub(crate) fn update_client(
     // - expected output info cell base on the input info cell,
     // - the tip client id.
     // - the expected client id, which will be the next tip client id.
-    let (expected_info, tip_client_id, expected_client_id) = {
-        let (mut input_info, tip_client_id, expected_client_id) = load_inputs(inputs)?;
+    let (expected_info, tip_client_id, expected_client_id, flags) = {
+        let (mut input_info, tip_client_id, expected_client_id, flags) = load_inputs(inputs)?;
         input_info.tip_client_id = expected_client_id;
-        (input_info, tip_client_id, expected_client_id)
+        (input_info, tip_client_id, expected_client_id, flags)
     };
     // Checks the output info cell, then returns the client cell and the index of the info cell.
     let (output_client, output_info_index) = load_outputs(outputs, &expected_info)?;
@@ -52,12 +52,12 @@ pub(crate) fn update_client(
         }
     };
 
-    expected_input_client.verify_new_client(&output_client, update)?;
+    expected_input_client.verify_new_client(&output_client, update, flags)?;
 
     Ok(())
 }
 
-fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8)> {
+fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8, u8)> {
     debug!("load cell data of inputs[{}]", inputs.0);
     let input_data_0 = hl::load_cell_data(inputs.0, Source::Input)?;
     debug!("load cell data of inputs[{}]", inputs.1);
@@ -90,16 +90,17 @@ fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8)> {
     let input_client_id: u8 = packed_input_client.id().into();
     debug!("input client id = {input_client_id}");
 
-    let clients_count: u8 = {
+    let (clients_count, flags) = {
         let script = hl::load_script()?;
         let script_args = script.args();
         let script_args_slice = script_args.as_reader().raw_data();
-        SpvTypeArgsReader::from_slice(script_args_slice)
-            .map_err(|_| SysError::Encoding)?
-            .clients_count()
-            .into()
+        let args =
+            SpvTypeArgsReader::from_slice(script_args_slice).map_err(|_| SysError::Encoding)?;
+        let clients_count: u8 = args.clients_count().into();
+        let flags: u8 = args.flags().into();
+        (clients_count, flags)
     };
-    debug!("clients count: {clients_count}");
+    debug!("clients count: {clients_count}, flags: {flags:08b}");
 
     let expected_client_id = utilities::next_client_id(input_info.tip_client_id, clients_count);
     debug!("expected client id = {expected_client_id}");
@@ -107,7 +108,7 @@ fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8)> {
         return Err(InternalError::UpdateInputClientIdIsMismatch.into());
     }
 
-    Ok((input_info, tip_client_id, expected_client_id))
+    Ok((input_info, tip_client_id, expected_client_id, flags))
 }
 
 fn load_outputs(
