@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 
 use ckb_bitcoin_spv_verifier::types::{
-    core::{SpvClient, SpvInfo},
+    core::{SpvClient, SpvInfo, U256},
     packed::{self, SpvClientReader, SpvInfoReader, SpvTypeArgsReader, SpvUpdateReader},
     prelude::*,
 };
@@ -19,14 +19,14 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     // - expected output info cell base on the input info cell,
     // - the new tip client id.
     // - the expected client ids, which will be the new tip client id and the ids of all the cleared clients.
-    // - the height of the old tip client.
+    // - the previous chain work of the old tip client.
     // - the id of the last client, whose blocks are all in main chain.
     // - the flags in SPV script args
     let (
         expected_info,
         expected_tip_client_id,
         expected_client_ids,
-        previous_tip_height,
+        previous_chain_work,
         fork_client_id,
         flags,
     ) = {
@@ -34,7 +34,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             mut input_info,
             expected_tip_client_id,
             expected_client_ids,
-            previous_tip_height,
+            previous_chain_work,
             fork_client_id,
             flags,
         ) = load_inputs(inputs)?;
@@ -43,7 +43,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             input_info,
             expected_tip_client_id,
             expected_client_ids,
-            previous_tip_height,
+            previous_chain_work,
             fork_client_id,
             flags,
         )
@@ -53,8 +53,11 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     let (output_client, output_info_index) =
         load_outputs(outputs, &expected_info, expected_client_ids)?;
     {
-        let new_tip_height: u32 = output_client.headers_mmr_root().max_height().unpack();
-        if previous_tip_height >= new_tip_height {
+        let new_chain_work: U256 = output_client
+            .headers_mmr_root()
+            .partial_chain_work()
+            .unpack();
+        if previous_chain_work >= new_chain_work {
             return Err(InternalError::ReorgNotBetterChain.into());
         }
     }
@@ -85,7 +88,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     Ok(())
 }
 
-fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8, u8)> {
+fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, U256, u8, u8)> {
     let mut client_ids_with_indexes = Vec::new();
     let mut input_info_opt = None;
     for i in inputs {
@@ -129,11 +132,14 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8, u8)> 
         .map(|(index, _)| *index)
         .ok_or(InternalError::ReorgInputTipClientNotFound)?;
     debug!("tip client index = {tip_client_index}");
-    let tip_height: u32 = {
+    let tip_chain_work: U256 = {
         let input_data = hl::load_cell_data(tip_client_index, Source::Input)?;
         if let Ok(packed_input_client) = SpvClientReader::from_slice(&input_data) {
             debug!("tip client = {packed_input_client} (index={tip_client_index})");
-            packed_input_client.headers_mmr_root().max_height().unpack()
+            packed_input_client
+                .headers_mmr_root()
+                .partial_chain_work()
+                .unpack()
         } else {
             return Err(InternalError::ReorgInputTipClientLoadFailed.into());
         }
@@ -182,7 +188,7 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, u32, u8, u8)> 
         input_info,
         expected_client_id,
         expected_client_ids,
-        tip_height,
+        tip_chain_work,
         fork_client_id,
         flags,
     ))
