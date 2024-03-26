@@ -77,3 +77,13 @@ jobs:
         run: make build
       - name: Unit Testing
         run: make test
+
+      - name: Print the size of each binaries and the cumulative size of each directory
+        if: matrix.os == 'ubuntu-latest'
+        run: tree -s --du build
+      - name: Archive the contract binaries ${{ github.sha }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: btc-spv-contract-binaries-${{ matrix.os }}-${{ github.sha }}
+          path: |
+            build/release
