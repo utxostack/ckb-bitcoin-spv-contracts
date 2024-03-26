@@ -57,10 +57,11 @@ pub fn main() -> Result<()> {
             debug!("create all cells");
             operations::create_cells(&indexes_of_outputs)?;
         }
-        (_, 0) => {
-            debug!("destroy all cells");
-            operations::destroy_cells(&indexes_of_inputs)?;
-        }
+        // TODO Disable destroy operations in first version.
+        // (_, 0) => {
+        //     debug!("destroy all cells");
+        //     operations::destroy_cells(&indexes_of_inputs)?;
+        // }
         (2, 2) => {
             debug!("update a client cell and the info cell");
             operations::update_client(
