@@ -64,6 +64,7 @@ fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8, u8)> {
     let input_data_1 = hl::load_cell_data(inputs.1, Source::Input)?;
 
     let (packed_input_info, packed_input_client) =
+        // ℹ️ Informing: Why not requiring the first cell be the info cell?
         if let Ok(input_info) = SpvInfoReader::from_slice(&input_data_0) {
             debug!("input info = {input_info} (index={})", inputs.0);
             if let Ok(input_client) = SpvClientReader::from_slice(&input_data_1) {

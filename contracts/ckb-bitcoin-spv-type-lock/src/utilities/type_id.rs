@@ -8,6 +8,8 @@ pub(crate) fn load_then_calculate_type_id(outputs_count: usize) -> Result<[u8; B
     let input = hl::load_input(0, Source::Input)?;
     let mut blake2b = new_blake2b();
     blake2b.update(input.as_slice());
+    // ℹ️ Informing: It's forbidden to create two sets with the same number of
+    // clients in one CKB tx.
     blake2b.update(&(outputs_count as u64).to_le_bytes());
     let mut ret = [0; BLAKE2B_LEN];
     blake2b.finalize(&mut ret);

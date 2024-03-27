@@ -16,6 +16,10 @@ pub fn main() -> Result<()> {
     debug!("script hash = {:#x}", script_hash.pack());
 
     // Find all input cells which use current script.
+    // 💭 Discussing: Just curious, why not using group inputs and outputs? The
+    // syscalls to load data support `Source::GroupInput` and
+    // `Source::GroupOutput`. So the indices are just the range `[0, n]`, and
+    // there is no need to check that these cells are continuous in the tx.
     let indexes_of_inputs = {
         let mut indexes = Vec::new();
         for (index, type_hash_opt) in
