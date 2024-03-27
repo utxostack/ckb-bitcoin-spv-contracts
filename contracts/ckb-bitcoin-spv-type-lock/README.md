@@ -7,8 +7,9 @@ A type script for Bitcoin SPV clients which synchronize [Bitcoin] state into [CK
 A [Bitcoin] SPV in [CKB] contains a set of cells, this type script is used
 to manage them.
 
-Since this type script has a unique ID in its script [`args`], so the size of
-the set of cells is immutable after they created.
+The set is identified by the script [`args`]. The number of live cells with this
+specific `args` script is fixed once created, and all cells in the set are
+destroyed together.
 
 ### Cells
 
@@ -57,7 +58,7 @@ There are 4 kinds of operations:
   Inputs:
   - Enough Capacity Cells
   Outputs:
-  - SPV Info (last_client_id=0)
+  - SPV Info (tip_client_id=0)
   - SPV Client (id=0)
   - SPV Client (id=1)
   - SPV Client (id=2)
@@ -82,7 +83,7 @@ There are 4 kinds of operations:
   - Type Lock
   - ... ...
   Inputs:
-  - SPV Info (last_client_id=0)
+  - SPV Info (tip_client_id=0)
   - SPV Client (id=0)
   - SPV Client (id=1)
   - SPV Client (id=2)
@@ -106,7 +107,8 @@ There are 4 kinds of operations:
   we consider that it has the latest data.
 
   The client cell who has the next ID of the  `tip_client_id` in the info cell,
-  we consider that it has the oldest data. The next ID of ID `n-1` is `0`.
+  we consider that it has the oldest data. These client cells form a ring, where
+  the next ID after `n-1` is `0`.
 
   Once we update the Bitcoin SPV instance, we put the new data into the client
   cell which has the oldest data, and update the `tip_client_id` in the client
@@ -122,11 +124,11 @@ There are 4 kinds of operations:
   - SPV Client (id=k)
   - ... ...
   Inputs:
-  - SPV Info (last_client_id=k)
+  - SPV Info (tip_client_id=k)
   - SPV Client (id=k+1)
   - ... ...
   Outputs:
-  - SPV Info (last_client_id=k+1)
+  - SPV Info (tip_client_id=k+1)
   - SPV Client (id=k+1)
   - ... ...
   Witnesses:
@@ -153,14 +155,14 @@ There are 4 kinds of operations:
   - SPV Client (id=t)
   - ... ...
   Inputs:
-  - SPV Info (last_client_id=k)
+  - SPV Info (tip_client_id=k)
   - SPV Client (id=t+1)
   - SPV Client (id=t+2)
   - SPV Client (id=...)
   - SPV Client (id=k)
   - ... ...
   Outputs:
-  - SPV Info (last_client_id=t+1)
+  - SPV Info (tip_client_id=t+1)
   - SPV Client (id=t+1)
   - SPV Client (id=t+2)
   - SPV Client (id=...)
