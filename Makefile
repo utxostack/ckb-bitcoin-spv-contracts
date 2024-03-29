@@ -112,4 +112,9 @@ CHECKSUM_FILE := build/checksums-$(MODE).txt
 checksum: build
 	sha256sum build/$(MODE)/* > $(CHECKSUM_FILE)
 
-.PHONY: build test check clippy fmt cargo clean prepare checksum
+# Docker reproducible build
+docker-build:
+	docker run --rm -v `pwd`:/code   docker.io/xxuejie/rust-n-llvm@sha256:71e98a25eb0350c779cdea18c296d101c4ddc375b8fd96531b63f3105ca64ca2   bash -c "cd /code; make checksum MODE=release CHECKSUM_FILE=checksums.txt"
+	sha256sum -c checksums.txt
+
+.PHONY: build test check clippy fmt cargo clean prepare checksum docker-build
