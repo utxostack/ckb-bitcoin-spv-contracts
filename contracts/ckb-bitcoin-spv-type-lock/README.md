@@ -197,6 +197,13 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 
   A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/prover/src/tests/service.rs#L132-L181).
 
+### Limits
+
+- The lower limit of SPV client cells count is 3.
+
+- The upper limit of SPV client cells count is not set, but base on the data type, `u8`,
+  any number larger than `250` is not recommended.
+
 ### Known Issues
 
 - `VM Internal Error: MemWriteOnExecutablePage`
@@ -204,6 +211,32 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
   Don't set hash type[^1] to be `Data`.
 
   `Data1` is introduced from [CKB RFC 0032], and `Data2` is introduced from [CKB RFC 0051].
+
+- Failed to reorg when there is only 1 stale SPV client.
+
+  When only 1 SPV client is stale, in the normal case, the reorg transaction
+  contains 1 input SPV client cell and 1 output SPV client cell is enough.
+
+  But, the structure of this transaction is totally the same as an update
+  transaction, this leads to ambiguity.
+
+  So, we define a rule to resolve this case:
+
+  - When there is only 1 SPV client is stale, the reorg transaction has to
+    rebuild 2 SPV client.
+
+    That means, the reorg transaction for 1 stale SPV client should contain 2
+    output SPV client cells and 2 output SPV client cells.
+
+    Since the reorg rarely happens in Bitcoin mainnet, the cost is acceptable.
+
+- Throw "arithmetic operation overflow" when update a Bitcoin SPV instance for
+  a Bitcoin dev chain.
+
+  The bitcoin dev chain doesn't follow the rule of difficulty change.
+
+  So, calculate the next target and partial chain work may lead to an
+  arithmetic operation overflow.
 
 [^1]: [Section "Code Locating"] in "CKB RFC 0022: CKB Transaction Structure".
 
