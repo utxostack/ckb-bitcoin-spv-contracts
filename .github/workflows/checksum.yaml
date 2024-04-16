@@ -1,0 +1,24 @@
+name: Checksum
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ubuntu-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Copy checksums.txt
+      run: cp checksums.txt ci-expected-checksums.txt
+    - name: Build binaries
+      run: make docker-build
+    - name: Checksum binaries
+      run: sha256sum -c ci-expected-checksums.txt
+
+
