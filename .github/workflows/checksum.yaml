@@ -1,0 +1,20 @@
+name: Checksum
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ubuntu-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Build binaries
+      run: make docker-build
+    - name: Checksum
+      run: git diff --exit-code checksums.txt
