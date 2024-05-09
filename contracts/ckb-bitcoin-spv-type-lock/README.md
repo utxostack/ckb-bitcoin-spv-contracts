@@ -1,3 +1,4 @@
+
 # CKB Bitcoin SPV Type Lock
 
 A type script for Bitcoin SPV clients which synchronize [Bitcoin] state into [CKB].
@@ -19,7 +20,20 @@ There are 2 kinds of cells in a Bitcoin SPV instance:
 
   This cell is used to store the Bitcoin state.
 
-  Each Bitcoin SPV instance should contain at least 1 client cell.
+  Each Bitcoin SPV instance should contain at least 3 client cells.
+
+  ```yaml
+  Client Cell:  
+    Type Script:
+      code hash: "..."
+      hash type: "type"
+      args: "typeid + clients count + flags"
+    Data:
+      - id
+      - btc tip block hash
+      - btc headers mmr root
+      - target adjust info
+  ```
 
 - Info Cell
 
@@ -27,6 +41,16 @@ There are 2 kinds of cells in a Bitcoin SPV instance:
   instance. Such as the ID of the tip client cell.
 
   Each Bitcoin SPV instance should contain only 1 info cell.
+
+  ```yaml
+  Info Cell:
+    Type Script:
+      code hash: "..."
+      hash type: "type"
+      args: "typeid + clients count + flags"
+    Data: 
+      - tip client cell id
+  ```
 
 ### Operations
 
