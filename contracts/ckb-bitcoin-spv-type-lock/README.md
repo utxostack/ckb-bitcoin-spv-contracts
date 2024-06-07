@@ -1,26 +1,21 @@
 
 # CKB Bitcoin SPV Type Lock
 
-A type script for Bitcoin SPV clients which synchronize [Bitcoin] state into [CKB].
+A type script designed for Bitcoin SPV clients synchronizes the [Bitcoin] blockchain state into the Nervos [CKB] network. 
 
 ## Brief Introduction
 
-A [Bitcoin] SPV in [CKB] contains a set of cells, this type script is used
-to manage them.
-
-The set is identified by the script [`args`]. The number of live cells with this
-specific `args` script is fixed once created, and all cells in the set are
-destroyed together.
+A Bitcoin  SPV on CKB consists of cells that are managed by the CKB Bitcoin SPV Type Lock and identified by the script args. The number of live cells with the script args remains fixed once created, and these cells will be destroyed collectively as a group.
 
 ### Cells
 
-There are 2 kinds of cells in a Bitcoin SPV instance:
+A Bitcoin SPV instance contains two types of cells: **SPV info cell** and **SPV client cell**.
 
-- Client Cell
+- **SPV Client Cell**
 
-  This cell is used to store the Bitcoin state.
+  A cell is identified as an SPV client cell if its type script matches the SPV type script.
 
-  Each Bitcoin SPV instance should contain at least 3 client cells.
+  SPV client cells store the Bitcoin state. Each Bitcoin SPV instance includes a minimum of three SPV client cells.
 
   ```yaml
   Client Cell:  
@@ -35,12 +30,10 @@ There are 2 kinds of cells in a Bitcoin SPV instance:
       - target adjust info
   ```
 
-- Info Cell
+- **SPV Info Cell**
 
-  This cell is used to store the basic information of current Bitcoin SPV
-  instance. Such as the ID of the tip client cell.
-
-  Each Bitcoin SPV instance should contain only 1 info cell.
+  The SPV info cell stores the basic information of the current Bitcoin SPV instance, such as `tip_ client_cell_id`. Each Bitcoin SPV
+  instance contains only one SPV info cell.
 
   ```yaml
   Info Cell:
@@ -54,26 +47,16 @@ There are 2 kinds of cells in a Bitcoin SPV instance:
 
 ### Operations
 
-There are 4 kinds of operations:
+There are 4 kinds of operations in the Bitcoin SPV type script:
 
-- Create
+- **Create**
 
-  Create all cells for a Bitcoin SPV instance in one transaction.
+  This operation initiates all necessary cells for a Bitcoin SPV instance in a single transaction.
 
-  The outputs of this transaction should contain 1 info cell and at least 1 client cell.
+  The `outputs` include one SPV info cell and at least one SPV client cell. Cells should be consecutive, with the SPV info cell first,
+  followed by N SPV client cells ordered by their ID from smallest to largest. 
 
-  In the follow part of this document, we denoted the number of client cells
-  as `n`.
-
-  In current implementation, it requires that cells must be continuous and
-  in specified order:
-
-  - The client info cell should be at the first.
-
-  - Immediately followed by `n` client cells, and these cells should be
-    ordered by their ID from smallest to largest.
-
-  The structure of this kind of transaction is as follows:
+  Let's denote the number of SPV client cells as `n`. The structure of this transaction is as follows:
 
   ```yaml
   Cell Deps:
@@ -95,10 +78,9 @@ There are 4 kinds of operations:
   - ... ...
   ```
 
-- Destroy
+- **Destroy**
 
-  All cells that use the same instance of this type lock should be destroyed
-  together in one transaction.
+  Cells within a single Bitcoin SPV instance should be destroyed in one transaction..
 
   The structure of this kind of transaction is as follows:
 
@@ -123,22 +105,15 @@ There are 4 kinds of operations:
   - ... ...
   ```
 
-- Update
+- **Update**
 
-  After creation, the `n` client cells should have same data.
+  The SPV client cell which ID matches the `tip_client_id` of the SPV info cell contains the most recent data, the SPV client cell next
+  in the sequence after the `tip_client_id` of the info cell holds the oldest data. This sequence arrangement of cells forms a loop
+  where after the last cell (`ID = n`), it wraps around back to the first cell (`ID = 0`).
 
-  The client cell who has the same ID as the `tip_client_id` in the info cell,
-  we consider that it has the latest data.
-
-  The client cell who has the next ID of the  `tip_client_id` in the info cell,
-  we consider that it has the oldest data. These client cells form a ring, where
-  the next ID after `n-1` is `0`.
-
-  Once we update the Bitcoin SPV instance, we put the new data into the client
-  cell which has the oldest data, and update the `tip_client_id` in the client
-  info cell to its ID.
-
-  Do the above step in repetition.
+  Once the Bitcoin SPV instance is updated, the new data will be put into the client cell that currently has the oldest data. Also,
+  the `tip_client_id` in the SPV info cell will be replaced by the `ID` of the SPV client cell that just received the new data. This SPV
+  info cell now becomes the new "latest data" holder.
 
   The structure of this kind of transaction is as follows:
 
@@ -160,18 +135,14 @@ There are 4 kinds of operations:
   - ... ...
   ```
 
-- Reorg
+- **Reorg**
 
-  When receives blocks from a new longer chain, and there has at least one
-  client cell whose tip block is the common ancestor block of both the old
-  chain and the new chain, then a chain reorganization will be required.
+  When receiving blocks from a new, longer chain, if the last common ancestor of both the old and new chains is identified by the [tip]
+  of client cell, a reorg is triggered. This reorg starts from this last common ancestor and rearranges the client cells accordingly.
 
-  **If no common ancestor block was found, then the Bitcoin SPV instance
-  will be broken, and it requires re-deployment.**
+  **If no common ancestor block is identified, the Bitcoin SPV instance will fail and require re-deployment.**
 
-  let's denote the client ID of the best common ancestor to be `t`.
-
-  The structure of this kind of transaction is as follows:
+  Let's denote the client ID of the best common ancestor as `t`. The structure of this transaction is as follows:
 
   ```yaml
   Cell Deps:
@@ -203,65 +174,55 @@ index of the output SPV info cell, and the proof should be set in
 
 ### Usages
 
-When you want to verify a transaction with Bitcoin SPV Client cell:
+To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
-- Choose any client cell which contains the block that transaction in.
+- Select an SPV client cell that contains the block where the transaction is;
 
 - Create a transaction proof, with the following data:
 
-  - The MMR proof of the header which contains this transaction.
+  - The MMR proof of the block header which contains this transaction;
 
-  - The TxOut proof of that transaction.
+  - The TxOut proof of the transaction;
 
-  - The index of that transaction.
+  - The index of the transaction;
 
-  - The height of that header.
+  - The height of the block header.
 
-- Use [the API `SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/verifier/src/types/extension/packed.rs#L275-L292) to verify the transaction.
-
-  A simple example could be found in [this test](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/prover/src/tests/service.rs#L132-L181).
+- Use the SpvClient::verify_transaction(..) for the verification. For detailed guidance, please refer to the [API example].
 
 ### Limits
 
-- The lower limit of SPV client cells count is 3.
+- The minimum count of SPV client cells is 3;
+  
+- While there is no fixed maximum count of SPV client cells; it is advisable not to exceed `250` given the **`u8`** data type.
 
-- The upper limit of SPV client cells count is not set, but base on the data type, `u8`,
-  any number larger than `250` is not recommended.
+### Known Issues and Solutions
 
-### Known Issues
+- **Issue #2**: `VM Internal Error: MemWriteOnExecutablePage`
 
-- `VM Internal Error: MemWriteOnExecutablePage`
+  **Solution**: Don't set hash type[^1] to be `Data`.
 
-  Don't set hash type[^1] to be `Data`.
+  For the appropriate use of hash type, refer to the "Code Locating" section in [CKB RFC 0022]. `Data1` is
+  introduced in [CKB RFC 0032], and `Data2` is introduced in [CKB RFC 0051].
 
-  `Data1` is introduced from [CKB RFC 0032], and `Data2` is introduced from [CKB RFC 0051].
+- **Issue #2**: Failed to reorg when there is only 1 stale SPV client.
 
-- Failed to reorg when there is only 1 stale SPV client.
+  **Solution**: When only one SPV client cell is stale, a typical reorg transaction has the same structure as an update transaction,
+  consisting of one SPV client cell in the inputs and one SPV client cell in the outputs. This similarity can lead to ambiguity.
 
-  When only 1 SPV client is stale, in the normal case, the reorg transaction
-  contains 1 input SPV client cell and 1 output SPV client cell is enough.
+  To address this issue, the following rules have been set: 
 
-  But, the structure of this transaction is totally the same as an update
-  transaction, this leads to ambiguity.
+    - In cases where only one SPV client has failed, the reorg transaction must involve the reconstruction of one separate SPV clients;
+    - Specifically, the reorg transaction for one stale SPV client should include two SPV client cell in the `inputs` and two SPV client
+    cell in the `outputs` ;
+    - Considering that reorgs are a rare occurrence on the Bitcoin mainnet, the cost incurred by this approach is considered manageable.
 
-  So, we define a rule to resolve this case:
-
-  - When there is only 1 SPV client is stale, the reorg transaction has to
-    rebuild 2 SPV client.
-
-    That means, the reorg transaction for 1 stale SPV client should contain 2
-    output SPV client cells and 2 output SPV client cells.
-
-    Since the reorg rarely happens in Bitcoin mainnet, the cost is acceptable.
-
-- Throw "arithmetic operation overflow" when update a Bitcoin SPV instance for
-  a Bitcoin dev chain.
-
-  The bitcoin dev chain doesn't follow the rule of difficulty change.
-
-  So, calculate the next target and partial chain work may lead to an
-  arithmetic operation overflow.
-
+- **Issue #3**: Throw **"Arithmetic Operation Overflow"** when updating a Bitcoin SPV instance for a Bitcoin dev chain.
+    
+    **Solution**: As the Bitcoin dev chain does not adhere to Bitcoin difficulty adjustment, calculations for the next target and the
+    partial chain work could result in an arithmetic overflow.
+    
+    
 [^1]: [Section "Code Locating"] in "CKB RFC 0022: CKB Transaction Structure".
 
 [Bitcoin]: https://bitcoin.org/
@@ -270,6 +231,11 @@ When you want to verify a transaction with Bitcoin SPV Client cell:
 [`args`]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0019-data-structures/0019-data-structures.md#description-1
 [the field `output_type` of `WitnessArgs`]: https://github.com/nervosnetwork/ckb/blob/v0.114.0/util/gen-types/schemas/blockchain.mol#L117
 
+[API example]:https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/prover/src/tests/service.rs#L132-L181
+
+[tip]:https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0004-ckb-block-sync/0004-ckb-block-sync.md
+
+[CKB RFC 0022]:https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0022-transaction-structure/0022-transaction-structure.md#code-locating
 [Section "Code Locating"]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0022-transaction-structure/0022-transaction-structure.md#code-locating
 [CKB RFC 0032]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0032-ckb-vm-version-selection/0032-ckb-vm-version-selection.md#specification
 [CKB RFC 0051]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0051-ckb2023/0051-ckb2023.md#ckb-vm-v2
