@@ -137,8 +137,9 @@ There are 4 kinds of operations in the Bitcoin SPV type script:
 
 - **Reorg**
 
-  When receiving blocks from a new, longer chain, if the last common ancestor of both the old and new chains is identified by the [tip]
-  of client cell, a reorg is triggered. This reorg starts from this last common ancestor and rearranges the client cells accordingly.
+  When receiving blocks from a new, longer chain, if there is at least one client cell whose tip block is the 
+  common ancestor block of both the old chain and the new chain, a reorg is triggered. The reorg will be based 
+  on this common ancestor, and all client cells with a tip higher than it will be updated accordingly.
 
   **If no common ancestor block is identified, the Bitcoin SPV instance will fail and require re-deployment.**
 
