@@ -189,7 +189,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
   - The height of the block header.
 
-- Use the SpvClient::verify_transaction(..) for the verification. For detailed guidance, please refer to the [API example].
+- Use the [`SpvClient::verify_transaction(..)`](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/2464c8f/verifier/src/types/extension/packed.rs#L275-L292) for the verification. For detailed guidance, please refer to the [API example].
 
 ### Limits
 
