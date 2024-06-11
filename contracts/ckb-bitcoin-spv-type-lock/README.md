@@ -219,7 +219,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
 - **Issue #3**: Throw **"Arithmetic Operation Overflow"** when updating a Bitcoin SPV instance for a Bitcoin dev chain.
     
-    **Solution**: As the Bitcoin dev chain does not adhere to Bitcoin difficulty adjustment, calculations for the next target and the
+    As the Bitcoin dev chain does not adhere to Bitcoin difficulty adjustment, calculations for the next target and the
     partial chain work could result in an arithmetic overflow.
     
     
