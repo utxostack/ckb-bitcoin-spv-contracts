@@ -111,7 +111,7 @@ There are 4 kinds of operations in the Bitcoin SPV type script:
   in the sequence after the `tip_client_id` of the info cell holds the oldest data. This sequence arrangement of cells forms a ring
   where after the last cell (`ID = n-1`), it wraps around back to the first cell (`ID = 0`).
 
-  Once the Bitcoin SPV instance is updated, the new data will be put into the client cell that currently has the oldest data. Also,
+  When the Bitcoin SPV instance is updated, the new data will be put into the client cell that currently has the oldest data. Also,
   the `tip_client_id` in the SPV info cell will be replaced by the `ID` of the SPV client cell that just received the new data. This SPV
   info cell now becomes the new "latest data" holder.
 
