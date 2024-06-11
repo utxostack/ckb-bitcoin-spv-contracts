@@ -208,7 +208,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 - **Issue #2**: Failed to reorg when there is only 1 stale SPV client.
 
   **Solution**: When only one SPV client cell is stale, a typical reorg transaction has the same structure as an update transaction,
-  consisting of one SPV client cell in the inputs and one SPV client cell in the outputs. This similarity can lead to ambiguity.
+  consisting of one SPV client cell in the inputs and one SPV client cell in the outputs. However, this similarity can lead to ambiguity.
 
   To address this issue, the following rules have been set: 
 
