@@ -202,8 +202,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
   **Solution**: Don't set hash type[^1] to be `Data`.
 
-  For the appropriate use of hash type, refer to the "Code Locating" section in [CKB RFC 0022]. `Data1` is
-  introduced in [CKB RFC 0032], and `Data2` is introduced in [CKB RFC 0051].
+  `Data1` is introduced in [CKB RFC 0032], and `Data2` is introduced in [CKB RFC 0051].
 
 - **Issue #2**: Failed to reorg when there is only 1 stale SPV client.
 
