@@ -199,7 +199,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
 ### Known Issues and Solutions
 
-- **Issue #2**: `VM Internal Error: MemWriteOnExecutablePage`
+- **Issue #1**: `VM Internal Error: MemWriteOnExecutablePage`
 
   **Solution**: Don't set hash type[^1] to be `Data`.
 
