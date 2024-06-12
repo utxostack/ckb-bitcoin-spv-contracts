@@ -32,7 +32,7 @@ A Bitcoin SPV instance contains two types of cells: **SPV info cell** and **SPV 
 
 - **SPV Info Cell**
 
-  The SPV info cell stores the basic information of the current Bitcoin SPV instance, such as `tip_ client_cell_id`. Each Bitcoin SPV
+  The SPV info cell stores the basic information of the current Bitcoin SPV instance, such as `tip_client_id`. Each Bitcoin SPV
   instance contains only one SPV info cell.
 
   ```yaml
