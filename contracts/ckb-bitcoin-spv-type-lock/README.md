@@ -45,6 +45,11 @@ A Bitcoin SPV instance contains two types of cells: **SPV info cell** and **SPV 
       - tip client cell id
   ```
 
+- Flags
+
+  Flags is the last part of `args` and takes up one byte. The highest two bits 
+  are used to indicate different btc chain types. see [btc chain type] for details.
+
 ### Operations
 
 There are 4 kinds of operations in the Bitcoin SPV type script:
@@ -239,3 +244,5 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 [Section "Code Locating"]: https://github.com/nervosnetwork/rfcs/blob/v2020.01.15/rfcs/0022-transaction-structure/0022-transaction-structure.md#code-locating
 [CKB RFC 0032]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0032-ckb-vm-version-selection/0032-ckb-vm-version-selection.md#specification
 [CKB RFC 0051]: https://github.com/nervosnetwork/rfcs/blob/dff5235616e5c7aec706326494dce1c54163c4be/rfcs/0051-ckb2023/0051-ckb2023.md#ckb-vm-v2
+
+[btc chain type]: https://github.com/ckb-cell/ckb-bitcoin-spv/blob/bfc71d7daf17e96f34e8e287f45254e512383330/verifier/src/constants.rs#L3
