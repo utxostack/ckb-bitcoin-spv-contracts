@@ -5,7 +5,7 @@ A type script designed for Bitcoin SPV clients ensures the valid synchronization
 
 ## Brief Introduction
 
-A Bitcoin  SPV on CKB consists of cells that are managed by the CKB Bitcoin SPV Type Lock and identified by the script args. The number of live cells with the script args remains fixed once created, and these cells will be destroyed collectively as a group.
+A Bitcoin  SPV on CKB consists of cells that are managed by the CKB Bitcoin SPV Type Script and identified by the script args. The number of live cells with the script args remains fixed once created, and these cells will be destroyed collectively as a group.
 
 ### Cells
 
