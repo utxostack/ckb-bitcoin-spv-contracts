@@ -47,7 +47,7 @@ A Bitcoin SPV instance contains two types of cells: **SPV info cell** and **SPV 
 
 - Flags
 
-  Flags is the last part of `args` and takes up one byte. The highest two bits 
+  [Flags](https://github.com/ckb-cell/ckb-bitcoin-spv/blob/bfc71d7daf17e96f34e8e287f45254e512383330/verifier/schemas/types.mol#L58) is the last part of `args` and takes up one byte. The highest two bits 
   are used to indicate different btc chain types. The supported chain types are:
   
   - Mainnet
