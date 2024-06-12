@@ -197,7 +197,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
 - The minimum count of SPV client cells is 3;
   
-- While there is no fixed maximum count of SPV client cells; it is advisable not to exceed `250` given the **`u8`** data type.
+- The maximum count of SPV client cells is advisable not to exceed `250` given the **`u8`** data type.
 
 ### Known Issues and Solutions
 
