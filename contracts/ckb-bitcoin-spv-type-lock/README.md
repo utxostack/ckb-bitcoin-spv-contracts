@@ -1,5 +1,5 @@
 
-# CKB Bitcoin SPV Type Lock
+# CKB Bitcoin SPV Type Script
 
 A type script designed for Bitcoin SPV clients ensures the valid synchronization of the [Bitcoin] blockchain state into the Nervos [CKB] network.
 
