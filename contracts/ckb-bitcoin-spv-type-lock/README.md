@@ -53,7 +53,7 @@ There are 4 kinds of operations in the Bitcoin SPV type script:
 
   This operation initiates all necessary cells for a Bitcoin SPV instance in a single transaction.
 
-  The `outputs` include one SPV info cell and at least one SPV client cell. Cells should be consecutive, with the SPV info cell first,
+  The `outputs` include one SPV info cell and at least three SPV client cell. Cells should be consecutive, with the SPV info cell first,
   followed by N SPV client cells ordered by their ID from smallest to largest. 
 
   Let's denote the number of SPV client cells as `n`. The structure of this transaction is as follows:
