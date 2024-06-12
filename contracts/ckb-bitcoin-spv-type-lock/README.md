@@ -216,7 +216,7 @@ To verify a transaction using the Bitcoin SPV Client cell, follow these steps:
 
     - In cases where only one SPV client has failed, the reorg transaction must involve the reconstruction of one additional SPV client;
     Specifically, the reorg transaction for one stale SPV client should include two SPV client cell in the `inputs` and two SPV client
-    cell in the `outputs` ;
+    cells in the `outputs` ;
     Considering that reorgs are a rare occurrence on the Bitcoin mainnet, the cost incurred by this approach is considered manageable.
 
 - **Issue #3**: Throw **"Arithmetic Operation Overflow"** when updating a Bitcoin SPV instance for a Bitcoin dev chain.
