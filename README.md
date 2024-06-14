@@ -19,6 +19,11 @@
 
   - ["Can Update Without Ownership" Lock](contracts/can-update-without-ownership-lock)
 
+## Audit Report
+
+An audit report has been conducted to ensure the security and functionality of the contracts. You can find the detailed report [here](./CKB%20Bitcoin%20SPV%20Contracts%20Audit%20Report.pdf).
+
+
 ## License
 
 Licensed under [MIT License].
