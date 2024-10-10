@@ -26,7 +26,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
         expected_info,
         expected_tip_client_id,
         expected_client_ids,
-        previous_chain_work,
+        _previous_chain_work,
         fork_client_id,
         flags,
     ) = {
@@ -53,13 +53,17 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     let (output_client, output_info_index) =
         load_outputs(outputs, &expected_info, expected_client_ids)?;
     {
-        let new_chain_work: U256 = output_client
-            .headers_mmr_root()
-            .partial_chain_work()
-            .unpack();
-        if previous_chain_work >= new_chain_work {
-            return Err(InternalError::ReorgNotBetterChain.into());
-        }
+        // If there is a limit on the number of headers to update
+        // it may cause the current work to be insufficient, but still on the main chain
+        // so here we no longer check the chain work
+
+        // let new_chain_work: U256 = output_client
+        //     .headers_mmr_root()
+        //     .partial_chain_work()
+        //     .unpack();
+        // if previous_chain_work >= new_chain_work {
+        //     return Err(InternalError::ReorgNotBetterChain.into());
+        // }
     }
     // Finds the only one index of cell deps which use current script.
     // That cell should be the client which at the fork point.
