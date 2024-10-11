@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 
 use ckb_bitcoin_spv_verifier::types::{
-    core::{SpvClient, SpvInfo, U256},
+    core::{BitcoinChainType, SpvClient, SpvInfo, U256},
     packed::{self, SpvClientReader, SpvInfoReader, SpvTypeArgsReader, SpvUpdateReader},
     prelude::*,
 };
@@ -53,12 +53,20 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     let (output_client, output_info_index) =
         load_outputs(outputs, &expected_info, expected_client_ids)?;
     {
-        let new_chain_work: U256 = output_client
-            .headers_mmr_root()
-            .partial_chain_work()
-            .unpack();
-        if previous_chain_work >= new_chain_work {
-            return Err(InternalError::ReorgNotBetterChain.into());
+        // Due to the block storm issue on testnet 3, a large number of blocks may be rolled back
+        // during a reorg, making it necessary to limit the update height.
+        // If there is a limit on the number of headers to update,
+        // the current chain work might not be sufficient but still remain on the main chain.
+        // Therefore, in this case, we no longer check the chain work.
+        // This handling is specific to testnet 3 to address the frequent block storm reorgs.
+        if BitcoinChainType::Testnet != flags.into() {
+            let new_chain_work: U256 = output_client
+                .headers_mmr_root()
+                .partial_chain_work()
+                .unpack();
+            if previous_chain_work >= new_chain_work {
+                return Err(InternalError::ReorgNotBetterChain.into());
+            }
         }
     }
     // Finds the only one index of cell deps which use current script.
