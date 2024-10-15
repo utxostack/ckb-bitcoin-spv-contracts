@@ -10,28 +10,35 @@ use crate::{
     utilities,
 };
 
-pub(crate) fn create_cells(indexes: &[usize], type_args: SpvTypeArgs) -> Result<()> {
-    if indexes.len() < 1 + 1 + 2 {
+pub(crate) fn reset_cells(
+    inputs: &[usize],
+    outputs: &[usize],
+    type_args: SpvTypeArgs,
+) -> Result<()> {
+    if outputs.len() < 1 + 1 + 2 {
         return Err(InternalError::CreateNotEnoughCells.into());
     }
-    if indexes.windows(2).any(|pair| pair[0] + 1 != pair[1]) {
+    if inputs.windows(2).any(|pair| pair[0] + 1 != pair[1]) {
+        return Err(InternalError::CreateShouldBeOrdered.into());
+    }
+    if outputs.windows(2).any(|pair| pair[0] + 1 != pair[1]) {
         return Err(InternalError::CreateShouldBeOrdered.into());
     }
     // Checks args of the client type script, then returns the clients count;
     let clients_count = {
         let clients_count = usize::from(type_args.clients_count);
         let cells_count = 1 + clients_count;
-        if indexes.len() != cells_count {
+        if outputs.len() != cells_count {
             return Err(InternalError::CreateCellsCountNotMatched.into());
         }
-        let type_id = utilities::load_then_calculate_type_id(indexes.len())?;
+        let type_id = utilities::load_then_calculate_type_id(outputs.len())?;
         if type_id != type_args.type_id.as_ref() {
             return Err(InternalError::CreateIncorrectUniqueId.into());
         }
         clients_count
     };
     // First cell is the client info cell.
-    let mut index = indexes[0];
+    let mut index = outputs[0];
     {
         debug!("check client info cell (index={index})");
         let output_data = hl::load_cell_data(index, Source::Output)?;

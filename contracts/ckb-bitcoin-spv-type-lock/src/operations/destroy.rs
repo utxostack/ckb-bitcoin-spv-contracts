@@ -1,16 +1,11 @@
+use ckb_bitcoin_spv_verifier::types::core::SpvTypeArgs;
 use ckb_std::debug;
 
-use crate::{
-    error::{InternalError, Result},
-    utilities,
-};
+use crate::error::{InternalError, Result};
 
-pub(crate) fn destroy_cells(indexes: &[usize]) -> Result<()> {
+pub(crate) fn destroy_cells(indexes: &[usize], type_args: SpvTypeArgs) -> Result<()> {
     debug!("destroyed count: {}", indexes.len());
-    let clients_count: u8 = {
-        let type_args = utilities::load_spv_type_args()?;
-        type_args.clients_count
-    };
+    let clients_count = type_args.clients_count;
     debug!("clients count: {clients_count}");
     let cells_count = 1 + usize::from(clients_count);
     debug!("cells count: {cells_count}");

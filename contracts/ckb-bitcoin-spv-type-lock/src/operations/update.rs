@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 
 use ckb_bitcoin_spv_verifier::types::{
-    core::{SpvClient, SpvInfo},
+    core::{SpvClient, SpvInfo, SpvTypeArgs},
     packed::{self, SpvClientReader, SpvInfoReader, SpvUpdateReader},
     prelude::*,
 };
@@ -18,13 +18,15 @@ pub(crate) fn update_client(
     inputs: (usize, usize),
     outputs: (usize, usize),
     script_hash: &[u8],
+    type_args: SpvTypeArgs,
 ) -> Result<()> {
     // Checks the id of the input client cell, then returns
     // - expected output info cell base on the input info cell,
     // - the tip client id.
     // - the expected client id, which will be the next tip client id.
     let (expected_info, tip_client_id, expected_client_id, flags) = {
-        let (mut input_info, tip_client_id, expected_client_id, flags) = load_inputs(inputs)?;
+        let (mut input_info, tip_client_id, expected_client_id, flags) =
+            load_inputs(inputs, type_args)?;
         input_info.tip_client_id = expected_client_id;
         (input_info, tip_client_id, expected_client_id, flags)
     };
@@ -57,7 +59,7 @@ pub(crate) fn update_client(
     Ok(())
 }
 
-fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8, u8)> {
+fn load_inputs(inputs: (usize, usize), type_args: SpvTypeArgs) -> Result<(SpvInfo, u8, u8, u8)> {
     debug!("load cell data of inputs[{}]", inputs.0);
     let input_data_0 = hl::load_cell_data(inputs.0, Source::Input)?;
     debug!("load cell data of inputs[{}]", inputs.1);
@@ -90,10 +92,7 @@ fn load_inputs(inputs: (usize, usize)) -> Result<(SpvInfo, u8, u8, u8)> {
     let input_client_id: u8 = packed_input_client.id().into();
     debug!("input client id = {input_client_id}");
 
-    let (clients_count, flags) = {
-        let type_args = utilities::load_spv_type_args()?;
-        (type_args.clients_count, type_args.flags)
-    };
+    let (clients_count, flags) = (type_args.clients_count, type_args.flags);
     debug!("clients count: {clients_count}, flags: {flags:08b}");
 
     let expected_client_id = utilities::next_client_id(input_info.tip_client_id, clients_count);
