@@ -236,7 +236,7 @@ version = "0.1.0"
 source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=bfc71d7#bfc71d7daf17e96f34e8e287f45254e512383330"
 dependencies = [
  "bitcoin",
- "ckb-bitcoin-spv-verifier",
+ "ckb-bitcoin-spv-verifier 0.1.0 (git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=bfc71d7)",
  "log",
  "thiserror",
 ]
@@ -245,9 +245,21 @@ dependencies = [
 name = "ckb-bitcoin-spv-type-lock"
 version = "0.2.0"
 dependencies = [
- "ckb-bitcoin-spv-verifier",
+ "ckb-bitcoin-spv-verifier 0.1.0 (git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=1ccd114)",
  "ckb-hash",
  "ckb-std",
+]
+
+[[package]]
+name = "ckb-bitcoin-spv-verifier"
+version = "0.1.0"
+source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=1ccd114#1ccd1140feb7699f0149df403c2db11c92fd2bdd"
+dependencies = [
+ "bitcoin",
+ "bitcoin_hashes",
+ "ckb-merkle-mountain-range 0.6.0",
+ "molecule",
+ "primitive-types",
 ]
 
 [[package]]
@@ -1594,7 +1606,7 @@ version = "0.1.0"
 dependencies = [
  "bitcoin",
  "ckb-bitcoin-spv-prover",
- "ckb-bitcoin-spv-verifier",
+ "ckb-bitcoin-spv-verifier 0.1.0 (git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=bfc71d7)",
  "ckb-std",
  "ckb-testtool",
  "env_logger",

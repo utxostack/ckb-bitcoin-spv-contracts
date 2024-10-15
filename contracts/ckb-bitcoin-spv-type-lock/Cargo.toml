@@ -15,6 +15,6 @@ ckb-hash = { version = "0.112.1", default-features = false, features = ["ckb-con
 [dependencies.ckb-bitcoin-spv-verifier]
 version = "0.1.0"
 git = "https://github.com/ckb-cell/ckb-bitcoin-spv"
-rev = "bfc71d7"
+rev = "1ccd114"
 default-features = false
 features = ["no-std"]

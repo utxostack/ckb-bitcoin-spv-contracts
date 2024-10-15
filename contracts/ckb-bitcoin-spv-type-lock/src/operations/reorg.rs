@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 
 use ckb_bitcoin_spv_verifier::types::{
     core::{BitcoinChainType, SpvClient, SpvInfo, U256},
-    packed::{self, SpvClientReader, SpvInfoReader, SpvTypeArgsReader, SpvUpdateReader},
+    packed::{self, SpvClientReader, SpvInfoReader, SpvUpdateReader},
     prelude::*,
 };
 #[cfg(debug_assertions)]
@@ -154,14 +154,8 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, U256, u8, u8)>
     };
 
     let (clients_count, flags) = {
-        let script = hl::load_script()?;
-        let script_args = script.args();
-        let script_args_slice = script_args.as_reader().raw_data();
-        let args =
-            SpvTypeArgsReader::from_slice(script_args_slice).map_err(|_| SysError::Encoding)?;
-        let clients_count: u8 = args.clients_count().into();
-        let flags: u8 = args.flags().into();
-        (clients_count, flags)
+        let type_args = utilities::load_spv_type_args()?;
+        (type_args.clients_count, type_args.flags)
     };
     debug!("clients count: {clients_count}, flags: {flags:08b}");
 
