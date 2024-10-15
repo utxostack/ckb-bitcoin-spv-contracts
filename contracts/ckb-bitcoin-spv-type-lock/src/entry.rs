@@ -89,7 +89,7 @@ pub fn main() -> Result<()> {
             if m == n && m > 2 && m == cells_count && BitcoinChainType::Testnet == flags.into() =>
         {
             debug!("reset all cells");
-            operations::reset_cells(&indexes_of_inputs, &indexes_of_outputs, type_args)?;
+            operations::reset_cells()?;
         }
         (_m, _n) => {
             debug!("unknown operation: {_m} inputs and {_n} outputs");
