@@ -1,8 +1,8 @@
 use alloc::vec::Vec;
 
 use ckb_bitcoin_spv_verifier::types::{
-    core::{BitcoinChainType, SpvClient, SpvInfo, U256},
-    packed::{self, SpvClientReader, SpvInfoReader, SpvTypeArgsReader, SpvUpdateReader},
+    core::{BitcoinChainType, SpvClient, SpvInfo, SpvTypeArgs, U256},
+    packed::{self, SpvClientReader, SpvInfoReader, SpvUpdateReader},
     prelude::*,
 };
 #[cfg(debug_assertions)]
@@ -14,7 +14,12 @@ use crate::{
     utilities,
 };
 
-pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[u8]) -> Result<()> {
+pub(crate) fn reorg_clients(
+    inputs: &[usize],
+    outputs: &[usize],
+    script_hash: &[u8],
+    type_args: SpvTypeArgs,
+) -> Result<()> {
     // Checks the ids of the input client cells, then returns
     // - expected output info cell base on the input info cell,
     // - the new tip client id.
@@ -37,7 +42,7 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
             previous_chain_work,
             fork_client_id,
             flags,
-        ) = load_inputs(inputs)?;
+        ) = load_inputs(inputs, type_args)?;
         input_info.tip_client_id = expected_tip_client_id;
         (
             input_info,
@@ -96,7 +101,10 @@ pub(crate) fn reorg_clients(inputs: &[usize], outputs: &[usize], script_hash: &[
     Ok(())
 }
 
-fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, U256, u8, u8)> {
+fn load_inputs(
+    inputs: &[usize],
+    type_args: SpvTypeArgs,
+) -> Result<(SpvInfo, u8, Vec<u8>, U256, u8, u8)> {
     let mut client_ids_with_indexes = Vec::new();
     let mut input_info_opt = None;
     for i in inputs {
@@ -153,16 +161,7 @@ fn load_inputs(inputs: &[usize]) -> Result<(SpvInfo, u8, Vec<u8>, U256, u8, u8)>
         }
     };
 
-    let (clients_count, flags) = {
-        let script = hl::load_script()?;
-        let script_args = script.args();
-        let script_args_slice = script_args.as_reader().raw_data();
-        let args =
-            SpvTypeArgsReader::from_slice(script_args_slice).map_err(|_| SysError::Encoding)?;
-        let clients_count: u8 = args.clients_count().into();
-        let flags: u8 = args.flags().into();
-        (clients_count, flags)
-    };
+    let (clients_count, flags) = (type_args.clients_count, type_args.flags);
     debug!("clients count: {clients_count}, flags: {flags:08b}");
 
     let mut client_ids = client_ids_with_indexes

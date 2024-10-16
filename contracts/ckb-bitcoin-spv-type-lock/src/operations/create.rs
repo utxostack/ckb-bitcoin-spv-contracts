@@ -1,5 +1,6 @@
 use ckb_bitcoin_spv_verifier::types::{
-    packed::{SpvBootstrapReader, SpvClientReader, SpvInfoReader, SpvTypeArgsReader},
+    core::SpvTypeArgs,
+    packed::{SpvBootstrapReader, SpvClientReader, SpvInfoReader},
     prelude::*,
 };
 use ckb_std::{ckb_constants::Source, debug, error::SysError, high_level as hl};
@@ -9,7 +10,7 @@ use crate::{
     utilities,
 };
 
-pub(crate) fn create_cells(indexes: &[usize]) -> Result<()> {
+pub(crate) fn create_cells(indexes: &[usize], type_args: SpvTypeArgs) -> Result<()> {
     if indexes.len() < 1 + 1 + 2 {
         return Err(InternalError::CreateNotEnoughCells.into());
     }
@@ -18,14 +19,6 @@ pub(crate) fn create_cells(indexes: &[usize]) -> Result<()> {
     }
     // Checks args of the client type script, then returns the clients count;
     let clients_count = {
-        let type_args = {
-            let script = hl::load_script()?;
-            let script_args = script.args();
-            let script_args_slice = script_args.as_reader().raw_data();
-            SpvTypeArgsReader::from_slice(script_args_slice)
-                .map_err(|_| SysError::Encoding)?
-                .unpack()
-        };
         let clients_count = usize::from(type_args.clients_count);
         let cells_count = 1 + clients_count;
         if indexes.len() != cells_count {
