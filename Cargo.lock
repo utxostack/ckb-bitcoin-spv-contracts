@@ -243,9 +243,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-bitcoin-spv-type-lock"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
- "ckb-bitcoin-spv-verifier 0.1.0 (git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=1ccd114)",
+ "ckb-bitcoin-spv-verifier 0.1.0 (git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=6c3f3d1)",
  "ckb-hash",
  "ckb-std",
 ]
@@ -253,7 +253,7 @@ dependencies = [
 [[package]]
 name = "ckb-bitcoin-spv-verifier"
 version = "0.1.0"
-source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=1ccd114#1ccd1140feb7699f0149df403c2db11c92fd2bdd"
+source = "git+https://github.com/ckb-cell/ckb-bitcoin-spv?rev=6c3f3d1#6c3f3d1aa8c109bd1e52b5beb2ed40c5a9c2e949"
 dependencies = [
  "bitcoin",
  "bitcoin_hashes",
